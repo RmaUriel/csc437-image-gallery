@@ -4,6 +4,7 @@ import { connectMongo } from "./connectMongo.js";
 import { ImageProvider } from "./ImageProvider.js";
 import { SHARED_TEST } from "../../shared/example.js";
 import { VALID_ROUTES} from "../../shared/ValidRoutes.js";
+import {registerImageRoutes} from "../routes/imageRoutes.js";
 
 function waitDuration(numMs) {
     return new Promise((resolve) => setTimeout(resolve, numMs));
@@ -16,7 +17,10 @@ const mongoClient = connectMongo();
 await mongoClient.connect();
 const imageProvider = new ImageProvider(mongoClient);
 
+app.use(express.json());
 app.use(express.static(STATIC_DIR));
+
+registerImageRoutes(app, imageProvider);
 
 app.get("/api/hello", (req, res) => {
     res.send("Hello, World " + SHARED_TEST);
@@ -30,15 +34,6 @@ app.get("/images/:imageId", (req, res) => {
     res.sendFile("index.html", { root: STATIC_DIR });
 });
 
-app.get("/api/images", async (req, res) => {
-    try {
-        await waitDuration(1000);
-        const images = await imageProvider.getAllImages();
-        res.json(images);
-    } catch (err) {
-        res.status(500).send(String(err?.message ?? err));
-    }
-});
 
 app.listen(PORT, () => {
     console.log(`Server running at http://localhost:${PORT}.  CTRL+C to stop.`);

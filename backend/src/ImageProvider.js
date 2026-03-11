@@ -1,4 +1,5 @@
 import { getEnvVar } from "./getEnvVar.js";
+import { ObjectId } from "mongodb";
 
 export class ImageProvider {
     constructor(mongoClient) {
@@ -7,6 +8,31 @@ export class ImageProvider {
             .db()
             .collection(getEnvVar("IMAGES_COLLECTION_NAME"));
         this.usersCollectionName = getEnvVar("USERS_COLLECTION_NAME");
+    }
+
+    async getOneImage(imageId) {
+        const objectId = new ObjectId(imageId);
+
+        const pipeline = [
+            { $match: { _id: objectId } },
+            {
+                $lookup: {
+                    from: this.usersCollectionName,
+                    localField: "authorId",
+                    foreignField: "username",
+                    as: "author",
+                },
+            },
+            {
+                $unwind: {
+                    path: "$author",
+                    preserveNullAndEmptyArrays: true,
+                },
+            },
+        ];
+
+        const results = await this.images.aggregate(pipeline).toArray();
+        return results[0] || null;
     }
 
     getAllImages() {
@@ -29,5 +55,16 @@ export class ImageProvider {
         });
 
         return this.images.aggregate(pipeline).toArray();
+    }
+
+    async updateImageName(imageId, newName) {
+        const objectId = new ObjectId(imageId);
+
+        const result = await this.images.updateOne(
+            { _id: objectId },
+            { $set: { name: newName } }
+        );
+
+        return result.matchedCount;
     }
 }
