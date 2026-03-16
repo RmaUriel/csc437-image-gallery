@@ -30,7 +30,7 @@ app.get(Object.values(VALID_ROUTES), (req, res) => {
     res.sendFile("index.html", { root: STATIC_DIR});
 });
 
-app.get("/images/:imageId", (req, res) => {
+app.get(Object.values(VALID_ROUTES), (req, res) => {
     res.sendFile("index.html", { root: STATIC_DIR });
 });
 
