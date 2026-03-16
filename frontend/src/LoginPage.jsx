@@ -32,7 +32,7 @@ export function LoginPage({isRegistering= false, onAuthSuccess}) {
             try {
                 data = await response.json();
             } catch {
-                //ignore
+
             }
 
             if (!response.ok) {

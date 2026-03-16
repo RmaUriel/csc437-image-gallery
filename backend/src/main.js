@@ -9,12 +9,11 @@ import { CredentialsProvider } from "./CredentialsProvider.js";
 import { registerAuthRoutes } from "../routes/authRoutes.js";
 import { verifyAuthToken } from "../routes/verifyAuthToken.js";
 
-function waitDuration(numMs) {
-    return new Promise((resolve) => setTimeout(resolve, numMs));
-}
 
 const PORT = Number.parseInt(getEnvVar("PORT", false), 10) || 3000;
 const STATIC_DIR = getEnvVar("STATIC_DIR") || "public";
+
+const IMAGE_UPLOAD_DIR = getEnvVar("IMAGE_UPLOAD_DIR") || "uploads";
 
 const app = express();
 const mongoClient = connectMongo();
@@ -25,6 +24,7 @@ const credentialsProvider = new CredentialsProvider(mongoClient);
 
 app.use(express.json());
 app.use(express.static(STATIC_DIR));
+app.use("/uploads", express.static(IMAGE_UPLOAD_DIR));
 
 registerAuthRoutes(app, credentialsProvider);
 app.use("/api/images", verifyAuthToken);

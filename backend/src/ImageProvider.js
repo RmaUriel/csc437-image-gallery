@@ -67,4 +67,15 @@ export class ImageProvider {
 
         return result.matchedCount;
     }
+
+    async createImage(imageDoc) {
+        const insertResult = await this.images.insertOne({
+            src: imageDoc.src,
+            name: imageDoc.name,
+            authorId: imageDoc.authorId
+        });
+        return String(insertResult.insertedId);
+    }
+
+
 }
