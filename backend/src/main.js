@@ -5,6 +5,9 @@ import { ImageProvider } from "./ImageProvider.js";
 import { SHARED_TEST } from "../../shared/example.js";
 import { VALID_ROUTES} from "../../shared/ValidRoutes.js";
 import {registerImageRoutes} from "../routes/imageRoutes.js";
+import { CredentialsProvider } from "./CredentialsProvider.js";
+import { registerAuthRoutes } from "../routes/authRoutes.js";
+import { verifyAuthToken } from "../routes/verifyAuthToken.js";
 
 function waitDuration(numMs) {
     return new Promise((resolve) => setTimeout(resolve, numMs));
@@ -12,13 +15,19 @@ function waitDuration(numMs) {
 
 const PORT = Number.parseInt(getEnvVar("PORT", false), 10) || 3000;
 const STATIC_DIR = getEnvVar("STATIC_DIR") || "public";
+
 const app = express();
 const mongoClient = connectMongo();
 await mongoClient.connect();
+
 const imageProvider = new ImageProvider(mongoClient);
+const credentialsProvider = new CredentialsProvider(mongoClient);
 
 app.use(express.json());
 app.use(express.static(STATIC_DIR));
+
+registerAuthRoutes(app, credentialsProvider);
+app.use("/api/images", verifyAuthToken);
 
 registerImageRoutes(app, imageProvider);
 
@@ -30,9 +39,6 @@ app.get(Object.values(VALID_ROUTES), (req, res) => {
     res.sendFile("index.html", { root: STATIC_DIR});
 });
 
-app.get(Object.values(VALID_ROUTES), (req, res) => {
-    res.sendFile("index.html", { root: STATIC_DIR });
-});
 
 
 app.listen(PORT, () => {

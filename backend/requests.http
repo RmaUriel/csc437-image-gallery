@@ -35,3 +35,59 @@ Content-Type: application/json
 {
   "name": "uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu"
 }
+
+### Register user2
+POST http://localhost:3000/api/users
+Content-Type: application/json
+
+{
+  "username": "seconduser",
+  "email": "sec@example.com",
+  "password": "thisIs"
+}
+
+### Register user
+POST http://localhost:3000/api/users
+Content-Type: application/json
+
+{
+  "username": "chunkylover23",
+  "email": "chunky@example.com",
+  "password": "password"
+}
+
+### Register duplicate user
+POST http://localhost:3000/api/users
+Content-Type: application/json
+
+{
+  "username": "chunkylover23",
+  "email": "chunky2@example.com",
+  "password": "password"
+}
+
+### Register bad payload
+POST http://localhost:3000/api/users
+Content-Type: application/json
+
+{
+  "username": "chunkylover23"
+}
+
+### Login
+POST http://localhost:3000/api/auth/tokens
+Content-Type: application/json
+
+{
+  "username": "chunkylover23",
+  "password": "password"
+}
+
+### Login Invalid
+POST http://localhost:3000/api/auth/tokens
+Content-Type: application/json
+
+{
+  "username": "seconduser",
+  "password": "ThisIsWrong"
+}

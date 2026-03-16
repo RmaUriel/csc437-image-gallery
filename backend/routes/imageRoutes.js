@@ -50,7 +50,7 @@ export function registerImageRoutes(app, imageProvider) {
 
     router.patch("/:id", async (req, res) => {
         const id = req.params.id;
-        const { name } = req.body;
+        const { name } = req.body ?? {};
 
 
         if (!ObjectId.isValid(id)) {
@@ -77,16 +77,23 @@ export function registerImageRoutes(app, imageProvider) {
         }
 
         try {
-            const matchedCount = await imageProvider.updateImageName(id, name);
-            if (matchedCount === 0) {
+            const image = await imageProvider.getOneImage(id);
+            if (!image) {
                 return res.status(404).send({
                     error: "Not Found",
                     message: "Image does not exist",
-                });
+                })
             }
 
-
+            if (image.authorId !== req.userInfo.username){
+                return res.status(403).send({
+                    error:" Forbidden",
+                    message: "This user does not own this image",
+                })
+            }
+            await imageProvider.updateImageName(id, name);
             return res.status(204).send();
+
         } catch (err) {
             console.error("PATCH /api/images/:id error:", err);
             return res.status(500).send({
