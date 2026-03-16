@@ -43,8 +43,8 @@ export function registerAuthRoutes(app, credentialsProvider) {
                     message: "Username already taken",
                 });
             }
-
-            return res.status(201).send();
+            const token = await generateAuthToken(username)
+            return res.status(201).send({token});
         } catch (err) {
             console.error("POST /api/users error:", err);
             return res.status(500).send({
