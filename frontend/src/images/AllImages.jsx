@@ -1,17 +1,20 @@
 import { useState } from "react";
-import { fetchAll } from "./ImageFetcher.js";
 import { ImageGrid } from "./ImageGrid.jsx";
 import { useEffect } from "react";
 
-export function AllImages() {
-    const [imageData, _setImageData] = useState(fetchAll);
+export function AllImages({authToken}) {
+    const [imageData, _setImageData] = useState([]);
     const [loading, _setLoading] = useState(true);
     const [error, _setError] = useState("");
 
     useEffect(() => {
         async function doFetch() {
             try {
-                const response = await fetch("/api/images");
+                const response = await fetch("/api/images", {
+                    headers: {
+                        Authorization: `Bearer ${authToken}`,
+                    },
+                });
 
                 if (!response.ok) {
                     throw new Error(
@@ -30,7 +33,7 @@ export function AllImages() {
         }
 
         doFetch();
-    }, []);
+    }, [authToken]);
 
     if (loading) {
         return <p>Loading...</p>;

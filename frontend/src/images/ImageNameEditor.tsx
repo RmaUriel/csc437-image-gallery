@@ -4,9 +4,10 @@ type Props = {
     imageId: string;
     initialValue?: string;
     onRenameSuccess?: (newName: string) => void;
+    authToken: string;
 };
 
-export function ImageNameEditor({ imageId, initialValue, onRenameSuccess }: Props) {
+export function ImageNameEditor({ imageId, initialValue, onRenameSuccess, authToken}: Props) {
     const [isEditingName, setIsEditingName] = useState(false);
     const [nameInput, setNameInput] = useState(initialValue || "");
 
@@ -30,6 +31,7 @@ export function ImageNameEditor({ imageId, initialValue, onRenameSuccess }: Prop
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",
+                    Authorization: `Bearer ${authToken}`,
                 },
                 body: JSON.stringify({ name: nameInput }),
             });
